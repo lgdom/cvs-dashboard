@@ -14,6 +14,32 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- AUTENTICACIÓN ---
+def check_password():
+    """Devuelve True si el usuario tiene la contraseña correcta."""
+    if "password_correct" not in st.session_state:
+        # Contenedor para centrar el login
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.title("🔐 Acceso CVS Dashboard")
+            with st.form("login_form"):
+                user = st.text_input("Usuario", key="user_input")
+                password = st.text_input("Contraseña", type="password", key="pass_input")
+                submit = st.form_submit_button("Ingresar al Panel")
+                
+                if submit:
+                    if user == st.secrets.get("DASHBOARD_USER") and password == st.secrets.get("DASHBOARD_PASS"):
+                        st.session_state["password_correct"] = True
+                        st.rerun()
+                    else:
+                        st.error("❌ Usuario o contraseña incorrectos")
+            st.info("Nota: Sus credenciales están protegidas por encriptación SSL.")
+        return False
+    return True
+
+if not check_password():
+    st.stop()
+
 # --- Estilización Base ---
 # Usamos el estilo nativo de Streamlit
 st.markdown("""
