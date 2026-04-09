@@ -331,9 +331,7 @@ if not df_prod.empty:
                 "avoidLabelOverlap": True,
                 "padAngle": 5,
                 "itemStyle": {
-                    "borderRadius": 10,
-                    "borderColor": "#fff",
-                    "borderWidth": 5,
+                    "borderRadius": 10
                 },
                 "label": {
                     "show": True,
