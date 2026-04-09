@@ -187,9 +187,15 @@ class ScraperService:
                                         xml_href = html.unescape(xml_href)
                                         url_xls = 'https://therion.victory-enterprises.com/Autentificados/Reporteador/' + xml_href.split('/Reporteador/')[1]
                                         r_xls = self.session.get(url_xls, verify=False)
-                                        prods = self.parse_cfdi_xml(r_xls.content, folio_val)
-                                        all_products.extend(prods)
+                                        
+                                        # VALIDACIÓN CRÍTICA: Asegurarse de que no sea una página HTML de error/login
+                                        if r_xls.status_code == 200 and b'<!DOCTYPE html>' not in r_xls.content[:100]:
+                                            prods = self.parse_cfdi_xml(r_xls.content, folio_val)
+                                            all_products.extend(prods)
+                                        else:
+                                            print(f" [!] Error en descarga de CFDI {folio_val}: Respuesta no válida del ERP.")
                                     time.sleep(0.3)
+
 
                 # Paginación
                 has_next = False
