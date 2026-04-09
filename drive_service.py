@@ -55,6 +55,9 @@ def download_file_from_drive(local_path, drive_filename, folder_id=DRIVE_FOLDER_
     Si no existe, no hace nada (o retorna False).
     """
     try:
+        # Asegurar que el directorio local existe (Crucial para Streamlit Cloud)
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)
+        
         service = get_drive_service()
         file_id = find_file_in_folder(service, drive_filename, folder_id)
         
@@ -76,6 +79,7 @@ def download_file_from_drive(local_path, drive_filename, folder_id=DRIVE_FOLDER_
         return True
     
     except Exception as e:
+        st.error(f"Error de Persistencia: No se pudo escribir en {local_path}. Verifique permisos.")
         print(f"Error descargando {drive_filename}: {e}")
         return False
 
@@ -84,9 +88,16 @@ def upload_file_to_drive(local_path, drive_filename, folder_id=DRIVE_FOLDER_ID):
     Sube (o actualiza) un archivo a Drive.
     """
     try:
+        # Asegurar directorio local base por si acaso
+        if os.path.dirname(local_path):
+            os.makedirs(os.path.dirname(local_path), exist_ok=True)
+            
         service = get_drive_service()
         file_id = find_file_in_folder(service, drive_filename, folder_id)
         
+        if not os.path.exists(local_path):
+             return False, f"Archivo local {local_path} no encontrado para subir."
+
         media = MediaFileUpload(local_path, resumable=True)
         
         if file_id:
@@ -95,7 +106,7 @@ def upload_file_to_drive(local_path, drive_filename, folder_id=DRIVE_FOLDER_ID):
             msg = f"Actualizado {drive_filename} (ID: {file_id})"
             print(msg)
         else:
-            # Crear nuevo
+            # Crear nuevo (Aunque el usuario ya subió los archivos, esto es por seguridad)
             file_metadata = {
                 'name': drive_filename,
                 'parents': [folder_id]
