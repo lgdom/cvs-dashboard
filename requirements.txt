@@ -1,0 +1,13 @@
+streamlit
+pandas
+streamlit-echarts
+requests
+beautifulsoup4
+html5lib
+lxml
+google-api-python-client
+google-auth-oauthlib
+google-auth-httplib2
+openpyxl
+calamine
+python-dotenv

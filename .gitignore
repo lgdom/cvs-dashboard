@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Streamlit
+.streamlit/secrets.toml
+static/
+
+# Datos y Credenciales (CRÍTICO: No subir a GitHub)
+data/
+*.csv
+*.png
+*.jpg
+service_account.json
+
+# Sistema
+.DS_Store
+.vscode/
+.idea/
