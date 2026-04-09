@@ -119,7 +119,8 @@ class ScraperService:
             soup_page = BeautifulSoup(resp_search.text, 'html.parser')
             
             try:
-                dfs = pd.read_html(resp_search.text, flavor='html5lib')
+                import io
+                dfs = pd.read_html(io.StringIO(resp_search.text), flavor='html5lib')
                 main_df = None
                 for df in dfs:
                     if len(df) > 2 and len(df.columns) > 5:
