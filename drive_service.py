@@ -12,17 +12,31 @@ SCOPES = ['https://www.googleapis.com/auth/drive']
 
 def get_drive_service():
     """Autentica y devuelve el servicio de Drive usando st.secrets."""
-    # Intentar cargar desde Streamlit Secrets (Nube)
+    import json
+    
+    # 1. Intentar cargar desde Streamlit Secrets (Nube)
     if "gcp_service_account" in st.secrets:
-        creds_dict = dict(st.secrets["gcp_service_account"])
-        creds = service_account.Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
+        creds_data = st.secrets["gcp_service_account"]
+        
+        # Si Streamlit lo cargó como string (común si no es TOML puro), lo parseamos
+        if isinstance(creds_data, str):
+            try:
+                creds_info = json.loads(creds_data)
+            except Exception as e:
+                raise ValueError(f"El secreto 'gcp_service_account' no es un JSON válido: {e}")
+        else:
+            # Si es un dict (TOML puro)
+            creds_info = dict(creds_data)
+            
+        creds = service_account.Credentials.from_service_account_info(creds_info, scopes=SCOPES)
+        
     else:
-        # Fallback local para desarrollo si el archivo existe
+        # Fallback local para desarrollo
         file_sa = "service_account.json"
-        if os.path.exists(file_sa):
+        if os.path.exists(file_sa) and not os.path.isdir(file_sa):
             creds = service_account.Credentials.from_service_account_file(file_sa, scopes=SCOPES)
         else:
-            raise FileNotFoundError("No se encontraron credenciales en st.secrets ni en service_account.json")
+            raise FileNotFoundError("No hay credenciales en st.secrets ni archivo 'service_account.json' válido.")
         
     return build('drive', 'v3', credentials=creds)
 
